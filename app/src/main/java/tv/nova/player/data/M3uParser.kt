@@ -141,7 +141,7 @@ private class CappedLineReader(
                     lastLineTooLong = tooLong
                     return out.toString()
                 }
-                else -> if (out.size < maxChars) out.append(char) else tooLong = true
+                else -> if (out.length < maxChars) out.append(char) else tooLong = true
             }
         }
     }
