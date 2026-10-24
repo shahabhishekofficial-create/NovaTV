@@ -26,7 +26,8 @@ jobs:
       - name: Unit tests and APK builds
         run: ./gradlew testDebugUnitTest assembleRelease assembleDebug --stacktrace
       - name: Enforce 3 MB release budget
-        run: python3 -c "from pathlib import Path; p=Path('app/build/outputs/apk/release/app-release.apk'); n=p.stat().st_size; print(f'Release APK: {n:,} bytes ({n/1024/1024:.2f} MiB)'); assert n <= 3_000_000, 'Release APK exceeds 3 MB budget'"
+        run: |
+          python3 -c "from pathlib import Path; p=Path('app/build/outputs/apk/release/app-release.apk'); n=p.stat().st_size; print(f'Release APK: {n:,} bytes ({n/1024/1024:.2f} MiB)'); assert n <= 3_000_000, 'Release APK exceeds 3 MB budget'"
       - name: Name distributable APKs
         run: |
           cp app/build/outputs/apk/release/app-release.apk novatv-release.apk
