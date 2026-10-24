@@ -100,7 +100,7 @@ for path in kotlin_files:
         if depth != 0:
             fail(f"{path.relative_to(ROOT)}: unbalanced {opening}{closing}")
             break
-    for kind,name in re.findall(r"\bR\.(id|string|color|drawable|layout|xml)\.([A-Za-z0-9_]+)",text):
+    for kind,name in re.findall(r"(?<!android\.)\bR\.(id|string|color|drawable|layout|xml)\.([A-Za-z0-9_]+)",text):
         if name not in resources.get(kind,set()):
             fail(f"{path.relative_to(ROOT)}: missing R.{kind}.{name}")
 

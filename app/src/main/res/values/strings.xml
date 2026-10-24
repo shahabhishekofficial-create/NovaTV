@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NovaTV</string>
+    <string name="novatv_wordmark">NOVA TV</string>
     <string name="search_hint">Search channels</string>
     <string name="welcome">Add an M3U playlist to start watching.</string>
+    <string name="channel_logo">Channel logo</string>
+    <string name="star_empty">☆</string>
+    <string name="star_full">★</string>
+    <string name="voice">Voice</string>
+    <string name="hd_plus">HD+</string>
+    <string name="playlists">Playlists</string>
+    <string name="refresh">Reload</string>
+    <string name="home_hints">OK Play  •  Long OK Favourite  •  MENU Channel picker  •  BACK Go back</string>
+    <string name="player_hints">OK Overlay  •  CH+/CH− Channel  •  PLAY/PAUSE Pause  •  INFO Stats  •  MENU Channels  •  BACK Channel list</string>
+    <string name="buffering">Buffering…</string>
+    <string name="retry">Retry</string>
+    <string name="back_to_channels">BACK returns to the channel list</string>
 </resources>

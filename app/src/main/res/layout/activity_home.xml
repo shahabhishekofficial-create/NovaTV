@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+    <LinearLayout
+        android:id="@+id/homeContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
+            <TextView
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:text="@string/novatv_wordmark"
+                android:textColor="@color/accent"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+            <EditText
+                android:id="@+id/searchInput"
+                android:layout_width="0dp"
+                android:layout_height="46dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_search"
+                android:hint="@string/search_hint"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:maxLines="1"
+                android:nextFocusDown="@id/channelGrid"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:textSize="17sp" />
+            <Button android:id="@+id/voiceButton" style="@style/TvButton" android:text="@string/voice" />
+            <Button android:id="@+id/hdButton" style="@style/TvButton" android:text="@string/hd_plus" />
+            <Button android:id="@+id/playlistsButton" style="@style/TvButton" android:text="@string/playlists" />
+            <Button android:id="@+id/refreshButton" style="@style/TvButton" android:text="@string/refresh" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="match_parent"
+            android:layout_height="26dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/categoryRail"
+                android:layout_width="184dp"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:nextFocusRight="@id/channelGrid"
+                android:paddingTop="4dp"
+                android:paddingBottom="8dp" />
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/channelGrid"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:nextFocusLeft="@id/categoryRail"
+                    android:padding="7dp" />
+                <TextView
+                    android:id="@+id/emptyText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="32dp"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="19sp"
+                    android:visibility="gone" />
+                <ProgressBar
+                    android:id="@+id/loadingProgress"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:gravity="center"
+            android:text="@string/home_hints"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/playerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        android:visibility="gone">
+        <SurfaceView
+            android:id="@+id/playerSurface"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/playerTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#AA000000"
+            android:padding="18dp"
+            android:paddingEnd="150dp"
+            android:textColor="@color/text_primary"
+            android:textSize="22sp" />
+        <TextView
+            android:id="@+id/playerClock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:background="#AA000000"
+            android:padding="18dp"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp" />
+        <TextView
+            android:id="@+id/bufferingText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#AA000000"
+            android:padding="18dp"
+            android:text="@string/buffering"
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/statsPanel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="66dp"
+            android:layout_marginEnd="16dp"
+            android:background="#CC101624"
+            android:padding="16dp"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:visibility="gone" />
+        <LinearLayout
+            android:id="@+id/errorCard"
+            android:layout_width="480dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_card"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone">
+            <TextView android:id="@+id/errorTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="24sp" android:textStyle="bold" />
+            <TextView android:id="@+id/errorMessage" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:textColor="@color/text_secondary" android:textSize="17sp" />
+            <Button android:id="@+id/retryButton" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="16dp" android:background="@drawable/bg_button" android:focusable="true" android:text="@string/retry" android:textColor="@color/text_primary" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="@string/back_to_channels" android:textColor="@color/text_secondary" android:textSize="13sp" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/playerHints"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="#AA000000"
+            android:gravity="center"
+            android:padding="14dp"
+            android:text="@string/player_hints"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp" />
+    </FrameLayout>
+</FrameLayout>
