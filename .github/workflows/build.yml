@@ -1,0 +1,47 @@
+name: Build NovaTV
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Static validation
+        run: python3 tools/validate.py
+      - name: Unit tests and APK builds
+        run: ./gradlew testDebugUnitTest assembleRelease assembleDebug --stacktrace
+      - name: Enforce 3 MB release budget
+        run: python3 -c "from pathlib import Path; p=Path('app/build/outputs/apk/release/app-release.apk'); n=p.stat().st_size; print(f'Release APK: {n:,} bytes ({n/1024/1024:.2f} MiB)'); assert n <= 3_000_000, 'Release APK exceeds 3 MB budget'"
+      - name: Name distributable APKs
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk novatv-release.apk
+          cp app/build/outputs/apk/debug/app-debug.apk novatv-debug.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: novatv-apk
+          path: |
+            novatv-release.apk
+            novatv-debug.apk
+          if-no-files-found: error
+      - name: Publish continuous pre-release on main
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view continuous --repo ${{ github.repository }} >/dev/null 2>&1 || gh release create continuous --repo ${{ github.repository }} --title 'NovaTV continuous' --notes 'Debug-signed release build. Ships no channels or content.' --prerelease
+          gh release upload continuous novatv-release.apk --repo ${{ github.repository }} --clobber

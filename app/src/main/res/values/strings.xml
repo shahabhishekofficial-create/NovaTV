@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NovaTV</string>
+    <string name="search_hint">Search channels</string>
+    <string name="welcome">Add an M3U playlist to start watching.</string>
+</resources>
