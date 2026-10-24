@@ -38,9 +38,9 @@ object M3uParser {
                     attributes = attribute.findAll(line).associate { it.groupValues[1].lowercase(Locale.ROOT) to it.groupValues[2] }
                 }
                 line.startsWith("#EXTGRP", true) -> group = line.substringAfter(':', "").trim()
-                line.startsWith("#EXTVLCOPT:http-user-agent", true) -> optionUserAgent = line.substringAfter(':', "").trim()
-                line.startsWith("#EXTVLCOPT:http-referrer", true) -> optionReferer = line.substringAfter(':', "").trim()
-                line.startsWith("#EXTVLCOPT:http-referer", true) -> optionReferer = line.substringAfter(':', "").trim()
+                line.startsWith("#EXTVLCOPT:http-user-agent", true) -> optionUserAgent = line.substringAfter('=', "").trim()
+                line.startsWith("#EXTVLCOPT:http-referrer", true) -> optionReferer = line.substringAfter('=', "").trim()
+                line.startsWith("#EXTVLCOPT:http-referer", true) -> optionReferer = line.substringAfter('=', "").trim()
                 line.startsWith("#") || line.isEmpty() -> Unit
                 else -> {
                     val parsedSource = StreamSource.parse(line, defaultUserAgent, defaultReferer)
