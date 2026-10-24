@@ -2,10 +2,17 @@
 
 Newest entries first.
 
+## 2026-10-25 — Phase 4 build proof and owner guide
+
+- Completed the README install/control/legal guide, dependency and performance notes, and the manual Android TV emulator smoke workflow.
+- GitHub Actions runs `40137408475` (branch) and `40137428223` (pull request) passed static validation, all 10 unit tests, release/debug builds, and the 3 MB APK gate on commit `2998271`. The preceding equivalent checkpoint measured the optimized release APK at 739,351 bytes (0.71 MiB).
+- The pairing QR algorithm was independently decoded to its exact test URL with an open-source decoder. This does not replace a physical phone scan.
+- No physical-device result is assumed; the checklist below remains open until Abhishek confirms it.
+
 ## 2026-10-25 — Phases 1–3 integrated TV experience
 
 - Added the D-pad home/grid/rail, favourites, recents, HD+ filtering, cached loading, custom player overlay, hardware-only playback, retries/fail-over, real stats, voice/search intents, multiple playlists, presets, deep links, and token-protected phone pairing with QR.
-- Static validation passes locally. Android compilation, tests, and APK size are pending CI for this integrated checkpoint.
+- Static validation and the integrated Android builds passed; see the Phase 4 verification entry above.
 
 ### Needs owner device test
 
@@ -18,7 +25,7 @@ Newest entries first.
 ## 2026-10-25 — Phase 1 catalogue logic
 
 - Added streaming M3U parsing with bounded lines, alternate sources, local stores, on-disk cache, playlist fetch/error mapping, and ranked normalized search.
-- Added pure unit tests for mandatory search terms, parser edge cases, 10,000 channels, quality labels, and header parsing. CI verification is pending for this checkpoint.
+- Added pure unit tests for mandatory search terms, parser edge cases, 10,000 channels, quality labels, and header parsing. Two implementation errors found by early CI were fixed; the final green evidence is above.
 
 ## 2026-10-25 — Phase 0 skeleton
 
