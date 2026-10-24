@@ -59,6 +59,14 @@ android {
     }
 }
 
+tasks.withType<Test> {
+    testLogging {
+        events("failed", "skipped")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showStandardStreams = true
+    }
+}
+
 dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.recyclerview:recyclerview:1.3.2")

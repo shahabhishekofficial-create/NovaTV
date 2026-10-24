@@ -22,7 +22,7 @@ class M3uParserTest {
         assertEquals("Star Plus HD", result[0].name)
         assertEquals("Entertainment", result[0].group)
         assertEquals(Quality.FHD, result[0].quality)
-        assertEquals("Custom Agent", result[1].sources[0].userAgent)
+        assertEquals("Parsed sources: ${result[1].sources}", "Custom Agent", result[1].sources[0].userAgent)
         assertEquals("https://example.invalid/", result[1].sources[0].referer)
         assertEquals("Fallback Name", result[1].name)
     }
