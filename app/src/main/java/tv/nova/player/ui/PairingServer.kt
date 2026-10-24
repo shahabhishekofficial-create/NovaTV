@@ -67,8 +67,10 @@ class PairingServer(private val onPlaylist: (PairingPayload) -> Unit) {
         scope = null
         runCatching { server?.close() }
         server = null
-        clients.forEach { runCatching { it.close() } }
-        clients.clear()
+        synchronized(clients) {
+            clients.forEach { runCatching { it.close() } }
+            clients.clear()
+        }
     }
 
     private fun handle(socket: Socket) {

@@ -89,8 +89,9 @@ class HomeActivity : Activity() {
             onActivate = { playlist -> loadPlaylist(playlist, showCache = true) },
             onEmpty = { emptyCatalogue() },
             onRefresh = { playlist ->
-                if (store.activePlaylistId() != playlist.id) store.setActive(playlist.id)
-                loadPlaylist(playlist, showCache = false)
+                val wasActive = store.activePlaylistId() == playlist.id
+                if (!wasActive) store.setActive(playlist.id)
+                loadPlaylist(playlist, showCache = !wasActive)
             },
         )
         updateHdButton()

@@ -113,7 +113,7 @@ class Store(context: Context) {
 
     fun resume(url: String): Long = resumeValues().optLong(url, 0L)
     private fun resumeValues(): JSONObject = try {
-        JSONObject(preferences.getString("resume", "{}"))
+        JSONObject(preferences.getString("resume", "{}").orEmpty())
     } catch (_: Exception) {
         JSONObject()
     }

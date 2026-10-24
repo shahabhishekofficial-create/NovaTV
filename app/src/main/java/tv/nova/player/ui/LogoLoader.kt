@@ -2,6 +2,8 @@ package tv.nova.player.ui
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Handler
+import android.os.Looper
 import android.util.LruCache
 import android.widget.ImageView
 import kotlinx.coroutines.CoroutineScope
@@ -21,6 +23,7 @@ import java.util.WeakHashMap
 /** Small bitmap loader: ~120×68 samples, 2 MiB RAM, 4 MiB disk, no third-party code. */
 class LogoLoader(private val context: android.content.Context, private val online: () -> Boolean) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val mainHandler = Handler(Looper.getMainLooper())
     private val directory = File(context.cacheDir, "logos").apply { mkdirs() }
     private val jobs = WeakHashMap<ImageView, Job>()
     private val connections = WeakHashMap<ImageView, ConnectionHolder>()
@@ -57,6 +60,14 @@ class LogoLoader(private val context: android.content.Context, private val onlin
             }
         }
         jobs[view] = job
+        job.invokeOnCompletion {
+            mainHandler.post {
+                if (jobs[view] === job) {
+                    jobs.remove(view)
+                    connections.remove(view)
+                }
+            }
+        }
     }
 
     fun cancel(view: ImageView) {
