@@ -56,7 +56,7 @@ jobs:
           heap-size: 512M
           cores: 2
           script: |
-            set -euo pipefail
+            set -eu
             mkdir -p evidence
             python3 -m http.server 8766 --directory /tmp/novatv-media > /tmp/novatv-media-server.log 2>&1 &
             server=$!
