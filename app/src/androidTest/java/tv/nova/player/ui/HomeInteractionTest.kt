@@ -49,6 +49,7 @@ class HomeInteractionTest : TvTestBase() {
         key(KeyEvent.KEYCODE_BACK)
         waitFor("BACK clears search") { gridCount() == 4 }
         assertTrue(activity.findViewById<EditText>(R.id.searchInput).text.isEmpty())
+        assertGridFocus("Star News HD")
         screenshot("home-controls-${testName.methodName}")
         key(KeyEvent.KEYCODE_BACK)
         waitFor("BACK leaves app") { activity.isFinishing }

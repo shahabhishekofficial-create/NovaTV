@@ -123,13 +123,16 @@ abstract class TvTestBase {
 
     protected fun focusGrid(position: Int) {
         onMain { activity.findViewById<RecyclerView>(R.id.channelGrid).scrollToPosition(position) }
-        instrumentation.waitForIdleSync()
-        onMain {
-            val grid = activity.findViewById<RecyclerView>(R.id.channelGrid)
-            val holder = grid.findViewHolderForAdapterPosition(position)
-            check(holder?.itemView?.requestFocus() == true) { "Could not focus grid position $position" }
+        waitFor("focus grid position $position") {
+            var focused = false
+            onMain {
+                val grid = activity.findViewById<RecyclerView>(R.id.channelGrid)
+                val item = grid.findViewHolderForAdapterPosition(position)?.itemView
+                item?.requestFocus()
+                focused = item?.hasFocus() == true
+            }
+            focused
         }
-        instrumentation.waitForIdleSync()
     }
 
     protected fun openChannel(name: String) {
