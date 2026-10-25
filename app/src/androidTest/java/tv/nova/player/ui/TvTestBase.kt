@@ -7,6 +7,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.EditText
@@ -80,7 +81,10 @@ abstract class TvTestBase {
     }
 
     protected fun key(keyCode: Int) {
-        instrumentation.sendKeyDownUpSync(keyCode)
+        onMain {
+            activity.dispatchKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
+            activity.dispatchKeyEvent(KeyEvent(KeyEvent.ACTION_UP, keyCode))
+        }
         instrumentation.waitForIdleSync()
     }
 
@@ -186,12 +190,26 @@ abstract class TvTestBase {
     }
 
     protected fun clickText(value: String, contains: Boolean = false) {
-        var node = waitForText(value, contains)
+        val label = waitForText(value, contains)
+        var clickable: AccessibilityNodeInfo? = label
         var depth = 0
-        while (!node.isClickable && depth++ < 20) {
-            node = node.parent ?: throw AssertionError("No clickable parent for '$value'. ${windowText()}")
+        while (clickable?.isClickable == false && depth++ < 20) clickable = clickable.parent
+        if (clickable?.isClickable == true) {
+            check(clickable.performAction(AccessibilityNodeInfo.ACTION_CLICK)) { "Could not click '$value'" }
+        } else {
+            val bounds = Rect()
+            label.getBoundsInScreen(bounds)
+            check(!bounds.isEmpty) { "No tap bounds for '$value'" }
+            val downTime = SystemClock.uptimeMillis()
+            val x = bounds.centerX().toFloat()
+            val y = bounds.centerY().toFloat()
+            val down = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, x, y, 0)
+            val up = MotionEvent.obtain(downTime, downTime + 60, MotionEvent.ACTION_UP, x, y, 0)
+            instrumentation.sendPointerSync(down)
+            instrumentation.sendPointerSync(up)
+            down.recycle()
+            up.recycle()
         }
-        check(node.performAction(AccessibilityNodeInfo.ACTION_CLICK)) { "Could not click '$value'" }
         instrumentation.waitForIdleSync()
     }
 
@@ -290,8 +308,8 @@ abstract class TvTestBase {
         fun mediaChannels(switchCount: Int = 0): String = buildString {
             append("#EXTM3U\n")
             fun channel(name: String, path: String, group: String = "Formats") {
-                append("#EXTINF:-1 group-title=\"").append(group).append("\",\"")
-                append(name).append("\"\n").append(MEDIA_HOST).append('/').append(path).append('\n')
+                append("#EXTINF:-1 group-title=\"").append(group).append("\",")
+                append(name).append('\n').append(MEDIA_HOST).append('/').append(path).append('\n')
             }
             channel("HLS Test HD", "video.m3u8")
             channel("MP4 Test HD", "video.mp4")

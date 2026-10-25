@@ -111,6 +111,8 @@ class HomeInteractionTest : TvTestBase() {
         waitForText(playlistUrl)
         clickText("Cancel")
         clickText("Close")
+        setSearch("")
+        waitFor("restore all channels") { gridCount() == 4 }
         waitForText("Star News HD")
     }
 }
