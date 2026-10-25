@@ -2,12 +2,19 @@
 
 Newest entries first.
 
+## 2026-10-25 — Green TV matrix ready for owner testing
+
+- Commit `a6ee8b0` passed Android TV emulator run `40170612301`: all seven instrumentation tests passed at both 1280×720 and 1920×1080, including the complete 50-switch sequence with duplicate stream URLs.
+- Build run `40170611267` passed static validation, unit tests, debug/release APK builds, and the 3 MB release-size gate on the same commit.
+- Input coverage combines visible-bounds checks, control activation, coordinate taps for list/dialog targets, and deterministic Activity key dispatch. This is emulator evidence, not proof of a physical remote, touchscreen, or TV panel.
+- Generated-stream tests confirmed decoded audio/video statistics; they did not establish speaker audibility, hardware-decoder behavior, or uninterrupted playback on owner networks. All physical-device checks below remain open.
+
 ## 2026-10-25 — TV interaction defects found and fixed
 
 - Emulator run `40165671866` executed all seven instrumentation tests at both 720p and 1080p. Five passed at each resolution, including generated HLS/MP4/TS/FLV/live playback and audio/video stats; the run remained red on two selection assertions.
 - Fixed zapping so the player uses channel identity rather than the first matching stream URL; 50-switch coverage includes channels that intentionally share a URL.
 - Fixed playlist actions so their selected row follows the active playlist after add/switch/delete operations. The test also taps a non-active row before Delete to cover manual selection.
-- These fixes require a fresh green matrix run before they are considered verified. Physical-device limitations below remain unchanged.
+- The later green matrix and its coverage boundaries are recorded above. Physical-device limitations below remain unchanged.
 
 ## 2026-10-25 — Android TV verification suite
 
