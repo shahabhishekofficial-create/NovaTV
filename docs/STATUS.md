@@ -2,6 +2,27 @@
 
 Newest entries first.
 
+## 2026-10-25 — Green TV matrix ready for owner testing
+
+- Commit `a6ee8b0` passed Android TV emulator run `40170612301`: all seven instrumentation tests passed at both 1280×720 and 1920×1080, including the complete 50-switch sequence with duplicate stream URLs.
+- Build run `40170611267` passed static validation, unit tests, debug/release APK builds, and the 3 MB release-size gate on the same commit.
+- Input coverage combines visible-bounds checks, control activation, coordinate taps for list/dialog targets, and deterministic Activity key dispatch. This is emulator evidence, not proof of a physical remote, touchscreen, or TV panel.
+- Generated-stream tests confirmed decoded audio/video statistics; they did not establish speaker audibility, hardware-decoder behavior, or uninterrupted playback on owner networks. All physical-device checks below remain open.
+
+## 2026-10-25 — TV interaction defects found and fixed
+
+- Emulator run `40165671866` executed all seven instrumentation tests at both 720p and 1080p. Five passed at each resolution, including generated HLS/MP4/TS/FLV/live playback and audio/video stats; the run remained red on two selection assertions.
+- Fixed zapping so the player uses channel identity rather than the first matching stream URL; 50-switch coverage includes channels that intentionally share a URL.
+- Fixed playlist actions so their selected row follows the active playlist after add/switch/delete operations. The test also taps a non-active row before Delete to cover manual selection.
+- The later green matrix and its coverage boundaries are recorded above. Physical-device limitations below remain unchanged.
+
+## 2026-10-25 — Android TV verification suite
+
+- Added built-in instrumentation coverage for home controls, search/filter/rail behavior, favourites/recents, BACK focus, playlist editor/presets/deletion, pairing security/submission/shutdown, external intents, HLS/MP4/TS/FLV/live playback, overlays, pause/resume, stats, fail-over, retry, and 50 channel switches.
+- CI generates synthetic 720p video plus an audio tone outside the APK and runs the suite at 720p and 1080p. Software video decoding is a test-only opt-in for cloud emulators; production remains hardware-only.
+- Emulator runs `40163685785` and `40163807197` stopped before installation because the requested `android-tv;x86_64` packages do not exist. Run `40163967440` selects the published API 30 TV `x86` image. No interaction/playback pass is claimed yet; inspect the latest workflow and artifacts for results.
+- Physical speaker audibility, real remote/Assistant behavior, launcher appearance, hardware codec/4K support, and TV-screen appearance still require the owner checks below.
+
 ## 2026-10-25 — Phase 4 build proof and owner guide
 
 - Completed the README install/control/legal guide, dependency and performance notes, and the manual Android TV emulator smoke workflow.

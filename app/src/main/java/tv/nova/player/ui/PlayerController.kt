@@ -171,7 +171,8 @@ class PlayerController(
     private fun step(direction: Int) {
         val channel = current ?: return
         if (queue.isEmpty()) return
-        val index = queue.indexOfFirst { it.url == channel.url }.let { if (it < 0) 0 else it }
+        val identityIndex = queue.indexOfFirst { it === channel }
+        val index = if (identityIndex >= 0) identityIndex else queue.indexOf(channel).coerceAtLeast(0)
         val next = (index + direction + queue.size) % queue.size
         play(queue[next], queue)
     }
@@ -287,12 +288,32 @@ class PlayerController(
         if (stats.visibility != View.VISIBLE) return
         val size = player.videoSize
         val format = player.videoFormat
+        val audio = player.audioFormat
         val formatBitrate = format?.bitrate ?: -1
         val bitrate = if (formatBitrate > 0) formatBitrate.toLong() else bandwidthEstimate
+        val state = when {
+            failed -> "Error"
+            player.playbackState == Player.STATE_BUFFERING -> "Buffering"
+            player.playbackState == Player.STATE_ENDED -> "Ended"
+            player.playbackState == Player.STATE_IDLE -> "Idle"
+            !player.playWhenReady -> "Paused"
+            else -> "Playing"
+        }
         stats.text = buildString {
-            append("Resolution: "); append(if (size.width > 0) "${size.width}×${size.height}" else "Detecting…")
+            append("State: "); append(state)
+            append("\nResolution: "); append(if (size.width > 0) "${size.width}×${size.height}" else "Detecting…")
             append("\nBitrate: "); append(if (bitrate > 0) String.format(Locale.ROOT, "%.1f Mbps", bitrate / 1_000_000f) else "Not reported")
             append("\nCodec: "); append(format?.codecs ?: decoderName.ifBlank { "Detecting…" })
+            append("\nAudio: ")
+            if (audio == null) {
+                append("Not reported")
+            } else {
+                append(audio.sampleMimeType ?: "Unknown")
+                append(" • ")
+                append(if (audio.sampleRate > 0) "${audio.sampleRate} Hz" else "rate unknown")
+                append(" • ")
+                append(if (audio.channelCount > 0) "${audio.channelCount} ch" else "channels unknown")
+            }
             append("\nDropped frames: "); append(droppedFrames)
             append("\nBuffer: "); append(player.totalBufferedDuration / 1000); append(" s")
             append("\nMode: "); append(if (player.isCurrentMediaItemLive) "Live" else "On demand")
