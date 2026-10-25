@@ -87,7 +87,8 @@ abstract class TvTestBase {
     protected fun longKey(keyCode: Int) {
         onMain {
             val now = SystemClock.uptimeMillis()
-            val down = KeyEvent(now, now, KeyEvent.ACTION_DOWN, keyCode, 1, 0, 0, 0, KeyEvent.FLAG_LONG_PRESS)
+            val base = KeyEvent(now, now, KeyEvent.ACTION_DOWN, keyCode, 1, 0)
+            val down = KeyEvent.changeFlags(base, KeyEvent.FLAG_LONG_PRESS)
             activity.dispatchKeyEvent(down)
             activity.dispatchKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_UP, keyCode))
         }
@@ -153,7 +154,7 @@ abstract class TvTestBase {
             result.set(findText(value, contains))
             result.get() != null
         }
-        return result.get()
+        return result.get() ?: throw AssertionError("No accessibility node for '$value'")
     }
 
     protected fun findText(value: String, contains: Boolean = false): AccessibilityNodeInfo? {
