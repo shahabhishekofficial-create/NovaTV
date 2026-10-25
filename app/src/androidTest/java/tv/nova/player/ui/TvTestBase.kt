@@ -81,20 +81,27 @@ abstract class TvTestBase {
     }
 
     protected fun key(keyCode: Int) {
-        onMain {
-            activity.dispatchKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
-            activity.dispatchKeyEvent(KeyEvent(KeyEvent.ACTION_UP, keyCode))
-        }
-        instrumentation.waitForIdleSync()
+        val now = SystemClock.uptimeMillis()
+        val down = KeyEvent(now, now, KeyEvent.ACTION_DOWN, keyCode, 0)
+        val up = KeyEvent(now, now + 60, KeyEvent.ACTION_UP, keyCode, 0)
+        injectKeys(down, up)
     }
 
     protected fun longKey(keyCode: Int) {
-        onMain {
-            val now = SystemClock.uptimeMillis()
-            val base = KeyEvent(now, now, KeyEvent.ACTION_DOWN, keyCode, 1, 0)
-            val down = KeyEvent.changeFlags(base, KeyEvent.FLAG_LONG_PRESS)
-            activity.dispatchKeyEvent(down)
-            activity.dispatchKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_UP, keyCode, 0))
+        val now = SystemClock.uptimeMillis()
+        val base = KeyEvent(now, now, KeyEvent.ACTION_DOWN, keyCode, 1, 0)
+        val down = KeyEvent.changeFlags(base, KeyEvent.FLAG_LONG_PRESS)
+        val up = KeyEvent(now, now + 60, KeyEvent.ACTION_UP, keyCode, 0)
+        injectKeys(down, up)
+    }
+
+    private fun injectKeys(vararg events: KeyEvent) {
+        try {
+            events.forEach { event ->
+                check(instrumentation.uiAutomation.injectInputEvent(event, true)) { "Could not inject $event" }
+            }
+        } finally {
+            events.forEach(KeyEvent::recycle)
         }
         instrumentation.waitForIdleSync()
     }
@@ -122,6 +129,7 @@ abstract class TvTestBase {
     }
 
     protected fun focusGrid(position: Int) {
+        key(KeyEvent.KEYCODE_DPAD_UP)
         onMain { activity.findViewById<RecyclerView>(R.id.channelGrid).scrollToPosition(position) }
         waitFor("focus grid position $position") {
             var focused = false
