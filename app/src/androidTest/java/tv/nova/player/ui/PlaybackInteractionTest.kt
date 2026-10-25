@@ -80,13 +80,16 @@ class PlaybackInteractionTest : TvTestBase() {
 
         setSearch("Switch")
         waitFor("ten-channel switching queue") { gridCount() == 10 }
+        val switchQueue = gridChannelNames()
+        val switchOffset = switchQueue.indexOf("Switch 1 HD")
+        check(switchOffset >= 0) { "Switch 1 HD missing from $switchQueue" }
         openChannel("Switch 1 HD")
         showStats()
         waitForPlayback("switch baseline")
         val heapBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()
         val nativeBefore = Debug.getNativeHeapAllocatedSize()
         repeat(50) { index ->
-            val expected = "Switch ${(index + 1) % 10 + 1} HD"
+            val expected = switchQueue[(switchOffset + index + 1) % switchQueue.size]
             key(KeyEvent.KEYCODE_MEDIA_NEXT)
             waitFor("switch ${index + 1} to $expected; actual '${text(R.id.playerTitle)}'") { text(R.id.playerTitle).startsWith(expected) }
         }

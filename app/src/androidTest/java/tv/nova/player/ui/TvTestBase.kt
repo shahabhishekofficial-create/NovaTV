@@ -148,6 +148,9 @@ abstract class TvTestBase {
 
     protected fun gridCount(): Int = activity.findViewById<RecyclerView>(R.id.channelGrid).adapter?.itemCount ?: 0
 
+    protected fun gridChannelNames(): List<String> =
+        (activity.findViewById<RecyclerView>(R.id.channelGrid).adapter as ChannelAdapter).snapshot.map { it.name }
+
     protected fun text(id: Int): String = activity.findViewById<TextView>(id).text.toString()
 
     protected fun isVisible(id: Int): Boolean = activity.findViewById<View>(id).visibility == View.VISIBLE
