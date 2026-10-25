@@ -77,6 +77,35 @@ jobs:
           mkdir -p evidence/test-results evidence/test-report
           cp -r app/build/outputs/androidTest-results/connected/* evidence/test-results/ 2>/dev/null || true
           cp -r app/build/reports/androidTests/connected/* evidence/test-report/ 2>/dev/null || true
+          python3 - <<'PY'
+          import os
+          import pathlib
+          import xml.etree.ElementTree as ET
+
+          def escape(value):
+              return value.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+
+          rows = []
+          for report in sorted(pathlib.Path('evidence/test-results').rglob('*.xml')):
+              try:
+                  suite = ET.parse(report).getroot()
+              except ET.ParseError:
+                  continue
+              for case in suite.iter('testcase'):
+                  name = f"{case.get('classname', '')}.{case.get('name', '')}"
+                  failure = case.find('failure')
+                  if failure is None:
+                      rows.append(f"| PASS | `{name}` |")
+                  else:
+                      message = failure.get('message') or (failure.text or 'Instrumentation failure')
+                      rows.append(f"| FAIL | `{name}` |")
+                      print(f"::error title={escape(name)}::{escape(message[:8000])}")
+          if rows:
+              summary = pathlib.Path(os.environ['GITHUB_STEP_SUMMARY'])
+              with summary.open('a') as output:
+                  output.write(f"## {os.environ.get('TV_PROFILE', 'TV')} instrumentation\n\n")
+                  output.write('| Result | Test |\n| --- | --- |\n' + '\n'.join(rows) + '\n')
+          PY
       - name: Upload TV verification evidence
         if: always()
         uses: actions/upload-artifact@v4
