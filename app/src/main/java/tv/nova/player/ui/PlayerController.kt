@@ -171,7 +171,8 @@ class PlayerController(
     private fun step(direction: Int) {
         val channel = current ?: return
         if (queue.isEmpty()) return
-        val index = queue.indexOfFirst { it.url == channel.url }.let { if (it < 0) 0 else it }
+        val identityIndex = queue.indexOfFirst { it === channel }
+        val index = if (identityIndex >= 0) identityIndex else queue.indexOf(channel).coerceAtLeast(0)
         val next = (index + direction + queue.size) % queue.size
         play(queue[next], queue)
     }

@@ -96,12 +96,13 @@ class PlaylistSetup(
     fun refreshList() {
         val values = store.playlists()
         val activeId = store.activePlaylistId()
-        selectedIndex = selectedIndex.coerceIn(0, (values.size - 1).coerceAtLeast(0))
+        val activeIndex = values.indexOfFirst { it.id == activeId }
+        selectedIndex = if (activeIndex >= 0) activeIndex else selectedIndex.coerceIn(0, (values.size - 1).coerceAtLeast(0))
         list?.adapter = ArrayAdapter(activity, android.R.layout.simple_list_item_single_choice, values.map { item ->
             val marker = if (item.id == activeId) "● " else ""
             "$marker${item.name} — ${formatTime(item.lastLoaded)}"
         })
-        list?.setItemChecked(values.indexOfFirst { it.id == activeId }.coerceAtLeast(0), values.isNotEmpty())
+        list?.setItemChecked(selectedIndex, values.isNotEmpty())
         list?.setOnItemClickListener { _, _, position, _ -> selectedIndex = position }
         details?.text = if (values.isEmpty()) {
             "No playlists. Add a URL, choose a preset, or scan the QR code with your phone."

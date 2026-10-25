@@ -194,6 +194,7 @@ abstract class TvTestBase {
         var clickable: AccessibilityNodeInfo? = label
         var depth = 0
         while (clickable?.isClickable == false && depth++ < 20) clickable = clickable.parent
+        if (clickable?.className == "android.widget.ListView") clickable = null
         if (clickable?.isClickable == true) {
             check(clickable.performAction(AccessibilityNodeInfo.ACTION_CLICK)) { "Could not click '$value'" }
         } else {

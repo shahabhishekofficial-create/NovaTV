@@ -2,6 +2,13 @@
 
 Newest entries first.
 
+## 2026-10-25 — TV interaction defects found and fixed
+
+- Emulator run `40165671866` executed all seven instrumentation tests at both 720p and 1080p. Five passed at each resolution, including generated HLS/MP4/TS/FLV/live playback and audio/video stats; the run remained red on two selection assertions.
+- Fixed zapping so the player uses channel identity rather than the first matching stream URL; 50-switch coverage includes channels that intentionally share a URL.
+- Fixed playlist actions so their selected row follows the active playlist after add/switch/delete operations. The test also taps a non-active row before Delete to cover manual selection.
+- These fixes require a fresh green matrix run before they are considered verified. Physical-device limitations below remain unchanged.
+
 ## 2026-10-25 — Android TV verification suite
 
 - Added built-in instrumentation coverage for home controls, search/filter/rail behavior, favourites/recents, BACK focus, playlist editor/presets/deletion, pairing security/submission/shutdown, external intents, HLS/MP4/TS/FLV/live playback, overlays, pause/resume, stats, fail-over, retry, and 50 channel switches.

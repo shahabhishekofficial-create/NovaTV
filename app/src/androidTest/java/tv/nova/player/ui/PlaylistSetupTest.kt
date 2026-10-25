@@ -33,6 +33,10 @@ class PlaylistSetupTest : TvTestBase() {
         clickText("Save")
         waitFor("editor save") { Store(activity).playlists().any { it.name == "Saved from test" } }
 
+        clickText("Instrumented playlist", contains = true)
+        clickText("Delete")
+        waitForText("Delete Instrumented playlist?")
+        clickText("Cancel")
         clickText("Saved from test", contains = true)
         clickText("Delete")
         waitForText("Delete Saved from test?")
