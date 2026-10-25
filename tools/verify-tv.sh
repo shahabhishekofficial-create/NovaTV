@@ -5,7 +5,16 @@ set -euo pipefail
 mkdir -p evidence
 python3 -m http.server 8766 --directory /tmp/novatv-media > /tmp/novatv-media-server.log 2>&1 &
 server=$!
-trap 'kill "$server" 2>/dev/null || true; adb logcat -d -t 2500 > evidence/logcat.txt || true; adb exec-out screencap -p > evidence/final-screen.png || true; adb pull /sdcard/Android/data/tv.nova.player.debug/files/test-evidence/ evidence/ || true; cp /tmp/novatv-media-server.log evidence/ || true' EXIT
+cleanup() {
+    kill "$server" 2>/dev/null || true
+    adb logcat -d -t 2500 > evidence/logcat.txt || true
+    adb exec-out screencap -p > evidence/final-screen.png || true
+    adb pull /sdcard/Android/data/tv.nova.player.debug/files/test-evidence/ evidence/ || true
+    cp /tmp/novatv-media-server.log evidence/ || true
+    find evidence -maxdepth 2 -type f -print | sort
+    grep 'NovaTvTest' evidence/logcat.txt || true
+}
+trap cleanup EXIT
 
 adb wait-for-device
 adb shell input keyevent 82
