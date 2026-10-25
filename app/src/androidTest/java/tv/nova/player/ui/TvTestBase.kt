@@ -101,7 +101,7 @@ abstract class TvTestBase {
                 check(instrumentation.uiAutomation.injectInputEvent(event, true)) { "Could not inject $event" }
             }
         } finally {
-            events.forEach(KeyEvent::recycle)
+            events.forEach { event -> event.recycle() }
         }
         instrumentation.waitForIdleSync()
     }
