@@ -90,7 +90,7 @@ abstract class TvTestBase {
             val base = KeyEvent(now, now, KeyEvent.ACTION_DOWN, keyCode, 1, 0)
             val down = KeyEvent.changeFlags(base, KeyEvent.FLAG_LONG_PRESS)
             activity.dispatchKeyEvent(down)
-            activity.dispatchKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_UP, keyCode))
+            activity.dispatchKeyEvent(KeyEvent(now, now, KeyEvent.ACTION_UP, keyCode, 0))
         }
         instrumentation.waitForIdleSync()
     }
