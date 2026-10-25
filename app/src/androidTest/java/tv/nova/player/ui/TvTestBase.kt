@@ -100,11 +100,14 @@ abstract class TvTestBase {
     }
 
     protected fun clickView(id: Int) {
+        val bounds = Rect()
         onMain {
             val view = activity.findViewById<View>(id)
-            check(view.visibility == View.VISIBLE) { "View $id is not visible" }
-            check(view.performClick()) { "View $id did not handle click" }
+            check(view.isShown) { "View $id is not visible" }
+            check(view.getGlobalVisibleRect(bounds)) { "View $id has no visible click area" }
+            check(bounds.width() == view.width && bounds.height() == view.height) { "View $id is clipped: $bounds" }
         }
+        tap(bounds)
         instrumentation.waitForIdleSync()
     }
 
@@ -204,17 +207,25 @@ abstract class TvTestBase {
             val bounds = Rect()
             label.getBoundsInScreen(bounds)
             check(!bounds.isEmpty) { "No tap bounds for '$value'" }
-            val downTime = SystemClock.uptimeMillis()
-            val x = bounds.centerX().toFloat()
-            val y = bounds.centerY().toFloat()
-            val down = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, x, y, 0)
-            val up = MotionEvent.obtain(downTime, downTime + 60, MotionEvent.ACTION_UP, x, y, 0)
+            tap(bounds)
+        }
+        instrumentation.waitForIdleSync()
+    }
+
+    private fun tap(bounds: Rect) {
+        check(!bounds.isEmpty) { "No tap bounds: $bounds" }
+        val downTime = SystemClock.uptimeMillis()
+        val x = bounds.centerX().toFloat()
+        val y = bounds.centerY().toFloat()
+        val down = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, x, y, 0)
+        val up = MotionEvent.obtain(downTime, downTime + 60, MotionEvent.ACTION_UP, x, y, 0)
+        try {
             instrumentation.sendPointerSync(down)
             instrumentation.sendPointerSync(up)
+        } finally {
             down.recycle()
             up.recycle()
         }
-        instrumentation.waitForIdleSync()
     }
 
     protected fun windowText(): String {
