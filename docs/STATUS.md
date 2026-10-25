@@ -2,6 +2,13 @@
 
 Newest entries first.
 
+## 2026-10-25 — Android TV verification suite
+
+- Added built-in instrumentation coverage for home controls, search/filter/rail behavior, favourites/recents, BACK focus, playlist editor/presets/deletion, pairing security/submission/shutdown, external intents, HLS/MP4/TS/FLV/live playback, overlays, pause/resume, stats, fail-over, retry, and 50 channel switches.
+- CI generates synthetic 720p video plus an audio tone outside the APK and runs the suite at 720p and 1080p. Software video decoding is a test-only opt-in for cloud emulators; production remains hardware-only.
+- Emulator runs `40163685785` and `40163807197` stopped before installation because the requested `android-tv;x86_64` packages do not exist. Run `40163967440` selects the published API 30 TV `x86` image. No interaction/playback pass is claimed yet; inspect the latest workflow and artifacts for results.
+- Physical speaker audibility, real remote/Assistant behavior, launcher appearance, hardware codec/4K support, and TV-screen appearance still require the owner checks below.
+
 ## 2026-10-25 — Phase 4 build proof and owner guide
 
 - Completed the README install/control/legal guide, dependency and performance notes, and the manual Android TV emulator smoke workflow.

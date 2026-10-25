@@ -2,6 +2,13 @@
 
 Newest entries first.
 
+## 2026-10-25 — TV verification
+
+- **Built-in instrumentation only:** Android's JUnit 3 runner and accessibility APIs exercise real views/dialogs without adding Espresso, UI Automator, or any other test/runtime dependency.
+- **Test-only software video:** `DecoderPolicy.allowSoftwareVideoForTests` is set by instrumentation before launch so software-only CI emulators can decode generated test media. It defaults to false; the production hardware-only policy is unchanged.
+- **Observable playback diagnostics:** INFO includes playback state and decoded audio MIME type, sample rate, and channel count. This supports automated stream/audio-path assertions, but emulator audio is not evidence of audible sound on a physical TV.
+- **Synthetic networked fixtures:** CI creates a test pattern and sine tone with FFmpeg, serves HLS/MP4/TS/FLV from the runner, and uses only the emulator's host loopback alias. No fixture is packaged or presented as a channel service.
+
 ## 2026-10-25
 
 - **One activity for home and playback:** `HomeActivity` owns both screens and `PlayerController` owns Media3. This follows the non-negotiable single-activity constraint rather than adding the phase note's separate `PlayerActivity`; there are no fragments or fragment dependencies.

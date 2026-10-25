@@ -9,17 +9,13 @@ import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
 import androidx.media3.exoplayer.video.MediaCodecVideoRenderer
 import androidx.media3.exoplayer.video.VideoRendererEventListener
-import java.util.Locale
 
 /** Excludes known software video decoders and disables decoder fallback loops. */
 @androidx.annotation.OptIn(UnstableApi::class)
 class HardwareRenderersFactory(context: Context) : DefaultRenderersFactory(context) {
     private val hardwareOnly = MediaCodecSelector { mimeType, secure, tunneling ->
-        MediaCodecUtil.getDecoderInfos(mimeType, secure, tunneling).filterNot { info ->
-            val name = info.name.lowercase(Locale.ROOT)
-            name.startsWith("omx.google.") || name.startsWith("c2.android.") ||
-                name.startsWith("omx.sw.") || name.startsWith("c2.sw.") ||
-                name.contains(".sw.") || name.contains("ffmpeg") || name.contains("avcodec")
+        MediaCodecUtil.getDecoderInfos(mimeType, secure, tunneling).filter { info ->
+            DecoderPolicy.shouldUseDecoder(info.name)
         }
     }
 

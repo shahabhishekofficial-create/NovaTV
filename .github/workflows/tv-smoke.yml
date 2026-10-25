@@ -1,18 +1,30 @@
-name: Android TV emulator smoke
+name: Android TV verification
 
 on:
   push:
     paths:
       - 'app/**'
+      - 'tools/generate-test-media.sh'
       - '.github/workflows/tv-smoke.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: tv-verification-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  tv-smoke:
+  tv-verification:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [tv_720p, tv_1080p]
+    env:
+      TV_PROFILE: ${{ matrix.profile }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -22,33 +34,46 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: List available TV emulator images
         run: sdkmanager --list | grep 'system-images;.*android-tv' || true
-      - name: Build release APK
-        run: ./gradlew assembleRelease
-      - name: Install and launch on Android TV
+      - name: Generate temporary test streams
+        run: tools/generate-test-media.sh /tmp/novatv-media
+      - name: Build app and instrumentation tests
+        run: ./gradlew testDebugUnitTest assembleDebug assembleDebugAndroidTest assembleRelease
+      - name: Verify Android TV at ${{ matrix.profile }}
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
           target: android-tv
           arch: x86
-          profile: tv_1080p
-          ram-size: 2048M
+          profile: ${{ matrix.profile }}
+          ram-size: 3072M
           heap-size: 512M
+          cores: 2
           script: |
             set -euo pipefail
-            trap 'adb logcat -d -t 400 > novatv-logcat.txt || true' EXIT
+            mkdir -p evidence
+            python3 -m http.server 8766 --directory /tmp/novatv-media > /tmp/novatv-media-server.log 2>&1 &
+            server=$!
+            trap 'kill "$server" 2>/dev/null || true; adb logcat -d -t 2500 > evidence/logcat.txt || true; adb exec-out screencap -p > evidence/final-screen.png || true; adb pull /sdcard/Android/data/tv.nova.player.debug/files/test-evidence/ evidence/ || true; cp /tmp/novatv-media-server.log evidence/ || true' EXIT
             adb wait-for-device
             adb shell input keyevent 82
+            curl --fail --retry 20 --retry-delay 1 http://127.0.0.1:8766/video.m3u8 > /dev/null
+            ./gradlew connectedDebugAndroidTest --stacktrace
             adb install -r app/build/outputs/apk/release/app-release.apk
             adb shell am start -W -n tv.nova.player/.ui.HomeActivity
-            sleep 12
+            sleep 5
             adb shell pidof tv.nova.player | grep -E '[0-9]+'
             adb shell dumpsys activity top | grep 'tv.nova.player'
-            adb exec-out screencap -p > novatv-tv-smoke.png
-      - name: Upload TV smoke evidence
+            adb exec-out screencap -p > "evidence/release-home-${TV_PROFILE}.png"
+      - name: Collect instrumentation reports
+        if: always()
+        run: |
+          mkdir -p evidence/test-results evidence/test-report
+          cp -r app/build/outputs/androidTest-results/connected/* evidence/test-results/ 2>/dev/null || true
+          cp -r app/build/reports/androidTests/connected/* evidence/test-report/ 2>/dev/null || true
+      - name: Upload TV verification evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: novatv-tv-smoke
-          path: |
-            novatv-tv-smoke.png
-            novatv-logcat.txt
+          name: novatv-tv-verification-${{ matrix.profile }}
+          path: evidence/
           if-no-files-found: warn
