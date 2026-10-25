@@ -78,6 +78,8 @@ class PlaybackInteractionTest : TvTestBase() {
         key(KeyEvent.KEYCODE_BACK)
         waitFor("leave failed channel") { !isVisible(R.id.playerContainer) }
 
+        setSearch("Switch")
+        waitFor("ten-channel switching queue") { gridCount() == 10 }
         openChannel("Switch 1 HD")
         showStats()
         waitForPlayback("switch baseline")
@@ -86,7 +88,7 @@ class PlaybackInteractionTest : TvTestBase() {
         repeat(50) { index ->
             val expected = "Switch ${(index + 1) % 10 + 1} HD"
             key(KeyEvent.KEYCODE_MEDIA_NEXT)
-            waitFor("switch ${index + 1} to $expected") { text(R.id.playerTitle).startsWith(expected) }
+            waitFor("switch ${index + 1} to $expected; actual '${text(R.id.playerTitle)}'") { text(R.id.playerTitle).startsWith(expected) }
         }
         waitForPlayback("after 50 switches")
         val heapAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()

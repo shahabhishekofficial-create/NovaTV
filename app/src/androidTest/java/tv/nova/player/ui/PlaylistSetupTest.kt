@@ -37,7 +37,7 @@ class PlaylistSetupTest : TvTestBase() {
         clickText("Delete")
         waitForText("Delete Instrumented playlist?")
         clickText("Cancel")
-        clickText("Saved from test", contains = true)
+        clickText("Saved from test —", contains = true)
         clickText("Delete")
         waitForText("Delete Saved from test?")
         clickText("Delete")
