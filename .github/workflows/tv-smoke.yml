@@ -1,6 +1,10 @@
 name: Android TV emulator smoke
 
 on:
+  push:
+    paths:
+      - 'app/**'
+      - '.github/workflows/tv-smoke.yml'
   workflow_dispatch:
 
 permissions:
