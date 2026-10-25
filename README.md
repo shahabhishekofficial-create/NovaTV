@@ -75,7 +75,7 @@ Playlist-level headers are defaults; entry-level `#EXTVLCOPT` values take preced
 | Long-press OK on a card | Add or remove a favourite (stored by stream URL) |
 | Back | Clear search/return to grid; in the player stop playback and return to the previously watched card; Back again can leave the app |
 | Menu | Open the channel picker |
-| Info | Show/hide real resolution, bitrate, codec, dropped-frame, buffer, and live/VOD stats |
+| Info | Show/hide real playback state, resolution, bitrate, video/audio codec details, dropped-frame, buffer, and live/VOD stats |
 | Channel + / Channel − | Next / previous channel |
 | Media Next / Previous | Next / previous channel |
 | Media Play/Pause | Pause/resume; a live stream resumes from its pause buffer |
@@ -117,6 +117,17 @@ python3 tools/validate.py
 ```
 
 Release output: `app/build/outputs/apk/release/app-release.apk`. CI uploads it as `novatv-release.apk` and updates the `continuous` pre-release on `main`.
+
+For on-device interaction tests, start an Android TV emulator, generate the synthetic CI-only HLS/MP4/TS/FLV files, and serve them on the host. The emulator reaches the host as `10.0.2.2`:
+
+```bash
+tools/generate-test-media.sh /tmp/novatv-media
+python3 -m http.server 8766 --directory /tmp/novatv-media &
+./gradlew connectedDebugAndroidTest
+kill $!
+```
+
+The **Android TV verification** workflow runs this at `tv_720p` and `tv_1080p`, then uploads screenshots, logcat, and instrumentation reports. Media files are synthetic test patterns/tone, not shipped content. Instrumentation alone can opt into software video decoding because cloud emulators have no TV hardware codec; normal app execution remains hardware-only. Audio-format checks do not prove physical speaker audibility.
 
 Regenerate the icon and exact 320×180 banner with standard-library Python only (no Pillow):
 
