@@ -32,8 +32,8 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: gradle/actions/setup-gradle@v4
-      - name: List available TV emulator images
-        run: sdkmanager --list | grep 'system-images;.*android-tv' || true
+      - name: Install FFmpeg for synthetic streams
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
       - name: Generate temporary test streams
         run: tools/generate-test-media.sh /tmp/novatv-media
       - name: Build app and instrumentation tests

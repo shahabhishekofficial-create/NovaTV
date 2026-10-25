@@ -109,7 +109,7 @@ Target budgets are ≤1.5 s cached cold start, ≤5 s initial 10,000-channel net
 
 ## Build and verify
 
-Requirements: free JDK 17, Android SDK 35, and Gradle wrapper 8.11.1 (AGP 8.7.3, Kotlin 2.0.21).
+Requirements: free JDK 17, Android SDK 35, and Gradle wrapper 8.11.1 (AGP 8.7.3, Kotlin 2.0.21). FFmpeg is also needed to generate the optional synthetic instrumentation streams.
 
 ```bash
 python3 tools/validate.py
