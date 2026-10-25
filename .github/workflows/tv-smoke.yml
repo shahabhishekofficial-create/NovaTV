@@ -25,7 +25,7 @@ jobs:
       - name: Install and launch on Android TV
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
+          api-level: 35
           target: android-tv
           arch: x86_64
           profile: tv_1080p
