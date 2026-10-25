@@ -12,7 +12,18 @@ adb shell input keyevent 82
 curl --fail --retry 20 --retry-delay 1 http://127.0.0.1:8766/video.m3u8 > /dev/null
 
 status=0
-./gradlew connectedDebugAndroidTest --stacktrace || status=$?
+for attempt in 1 2; do
+    set +e
+    ./gradlew connectedDebugAndroidTest --stacktrace 2>&1 | tee /tmp/novatv-connected-tests.log
+    status=${PIPESTATUS[0]}
+    set -e
+    if [[ $status -eq 0 || $attempt -eq 2 ]] || ! grep -Eq 'Received status code (429|5[0-9][0-9])|repo.maven.apache.org.*(timed out|Timeout)' /tmp/novatv-connected-tests.log; then
+        break
+    fi
+    echo 'Transient repository download failure; retrying the Gradle task once.'
+    sleep 15
+done
+cp /tmp/novatv-connected-tests.log evidence/ || true
 if [[ $status -ne 0 ]]; then
     exit "$status"
 fi
