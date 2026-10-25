@@ -1,5 +1,11 @@
 package tv.nova.player.ui
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.junit.runner.RunWith
 import tv.nova.player.R
 import tv.nova.player.data.Store
 import java.net.HttpURLConnection
@@ -8,13 +14,15 @@ import java.net.Socket
 import java.net.URL
 import java.net.URLEncoder
 
+@RunWith(AndroidJUnit4::class)
 class PlaylistSetupTest : TvTestBase() {
+    @Test
     fun testEditorPresetDeleteButtonsAndLayout() {
         launchHome()
         clickView(R.id.playlistsButton)
         waitForText("Playlists")
         assertVisibleTextFits()
-        screenshot("playlist-setup-${name ?: "test"}")
+        screenshot("playlist-setup-${testName.methodName}")
 
         clickText("Add URL")
         waitForText("Add playlist")
@@ -59,6 +67,7 @@ class PlaylistSetupTest : TvTestBase() {
         waitForText("Star News HD")
     }
 
+    @Test
     fun testPairingSecuritySubmissionAndShutdown() {
         launchHome()
         clickView(R.id.playlistsButton)

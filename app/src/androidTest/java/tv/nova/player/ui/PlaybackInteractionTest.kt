@@ -2,9 +2,16 @@ package tv.nova.player.ui
 
 import android.os.Debug
 import android.view.KeyEvent
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.junit.runner.RunWith
 import tv.nova.player.R
 
+@RunWith(AndroidJUnit4::class)
 class PlaybackInteractionTest : TvTestBase() {
+    @Test
     fun testFormatsOverlayPauseStatsAndZap() {
         launchHome(mediaChannels())
         openChannel("HLS Test HD")
@@ -47,6 +54,7 @@ class PlaybackInteractionTest : TvTestBase() {
         }
     }
 
+    @Test
     fun testFailoverRetryAndFiftySwitches() {
         launchHome(mediaChannels(switchCount = 10))
         openChannel("Failover Test HD")

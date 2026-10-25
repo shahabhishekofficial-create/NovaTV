@@ -5,11 +5,17 @@ import android.net.Uri
 import android.speech.RecognizerIntent
 import android.view.KeyEvent
 import android.widget.EditText
-import androidx.recyclerview.widget.RecyclerView
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.junit.runner.RunWith
 import tv.nova.player.R
 import tv.nova.player.data.Store
 
+@RunWith(AndroidJUnit4::class)
 class HomeInteractionTest : TvTestBase() {
+    @Test
     fun testHomeButtonsSearchFiltersAndBack() {
         launchHome()
         waitForText("Star News HD")
@@ -43,11 +49,12 @@ class HomeInteractionTest : TvTestBase() {
         key(KeyEvent.KEYCODE_BACK)
         waitFor("BACK clears search") { gridCount() == 4 }
         assertTrue(activity.findViewById<EditText>(R.id.searchInput).text.isEmpty())
-        screenshot("home-controls-${name ?: "test"}")
+        screenshot("home-controls-${testName.methodName}")
         key(KeyEvent.KEYCODE_BACK)
         waitFor("BACK leaves app") { activity.isFinishing }
     }
 
+    @Test
     fun testFavouritesChannelPickerAndRecents() {
         launchHome()
         focusGrid(0)
@@ -74,6 +81,7 @@ class HomeInteractionTest : TvTestBase() {
         waitForText("Cricket HD")
     }
 
+    @Test
     fun testVoiceFallbackAndExternalIntents() {
         launchHome()
         val voiceIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -85,14 +93,20 @@ class HomeInteractionTest : TvTestBase() {
             logEvidence("A recognizer exists; external voice UI is not driven by this test")
         }
 
-        val search = Intent(Intent.ACTION_SEARCH).putExtra(android.app.SearchManager.QUERY, "sports")
-        onMain { activity.onNewIntent(search) }
+        val search = Intent(activity, HomeActivity::class.java).apply {
+            action = Intent.ACTION_SEARCH
+            putExtra(android.app.SearchManager.QUERY, "sports")
+        }
+        onMain { activity.startActivity(search) }
         waitFor("ACTION_SEARCH") { gridCount() == 2 }
         assertEquals("sports", activity.findViewById<EditText>(R.id.searchInput).text.toString())
 
         val playlistUrl = "http://10.0.2.2:8766/deep-link.m3u"
-        val deepLink = Intent(Intent.ACTION_VIEW, Uri.parse("novatv://playlist?url=${Uri.encode(playlistUrl)}"))
-        onMain { activity.onNewIntent(deepLink) }
+        val deepLink = Intent(activity, HomeActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            data = Uri.parse("novatv://playlist?url=${Uri.encode(playlistUrl)}")
+        }
+        onMain { activity.startActivity(deepLink) }
         waitForText("Add playlist")
         waitForText(playlistUrl)
         clickText("Cancel")

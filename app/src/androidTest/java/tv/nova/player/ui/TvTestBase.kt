@@ -1,17 +1,24 @@
 package tv.nova.player.ui
 
 import android.app.Instrumentation
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.SystemClock
-import android.test.ActivityInstrumentationTestCase2
 import android.view.KeyEvent
 import android.view.View
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Rule
+import org.junit.rules.TestName
 import tv.nova.player.R
 import tv.nova.player.data.Playlist
 import tv.nova.player.data.Store
@@ -19,13 +26,16 @@ import java.io.File
 import java.util.ArrayDeque
 import java.util.concurrent.atomic.AtomicReference
 
-@Suppress("DEPRECATION")
-abstract class TvTestBase : ActivityInstrumentationTestCase2<HomeActivity>(HomeActivity::class.java) {
+abstract class TvTestBase {
+    @get:Rule
+    val testName = TestName()
+
+    protected val instrumentation: Instrumentation get() = InstrumentationRegistry.getInstrumentation()
     protected lateinit var activity: HomeActivity
     private lateinit var evidenceDirectory: File
 
-    override fun setUp() {
-        super.setUp()
+    @Before
+    fun setUp() {
         DecoderPolicy.allowSoftwareVideoForTests = true
         val context = instrumentation.targetContext
         context.getSharedPreferences("novatv", 0).edit().clear().commit()
@@ -33,14 +43,14 @@ abstract class TvTestBase : ActivityInstrumentationTestCase2<HomeActivity>(HomeA
         evidenceDirectory = File(context.getExternalFilesDir(null), "test-evidence").apply { mkdirs() }
     }
 
-    override fun tearDown() {
+    @After
+    fun tearDown() {
         if (::activity.isInitialized) {
-            screenshot("${name ?: "test"}-final")
+            screenshot("${testName.methodName}-final")
             onMain { activity.finish() }
             instrumentation.waitForIdleSync()
         }
         DecoderPolicy.allowSoftwareVideoForTests = false
-        super.tearDown()
     }
 
     protected fun launchHome(
@@ -58,7 +68,8 @@ abstract class TvTestBase : ActivityInstrumentationTestCase2<HomeActivity>(HomeA
         store.savePlaylist(playlist)
         store.setActive(playlist.id)
         store.cacheFile(playlist).writeText(m3u)
-        activity = getActivity()
+        val launch = Intent(context, HomeActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        activity = instrumentation.startActivitySync(launch) as HomeActivity
         waitFor("cached channel grid") { gridCount() > 0 }
         return activity
     }
@@ -256,7 +267,7 @@ abstract class TvTestBase : ActivityInstrumentationTestCase2<HomeActivity>(HomeA
     }
 
     protected fun logEvidence(message: String) {
-        android.util.Log.i("NovaTvTest", "${name ?: "test"}: $message")
+        android.util.Log.i("NovaTvTest", "${testName.methodName}: $message")
     }
 
     private fun resourceName(id: Int): String = runCatching { activity.resources.getResourceEntryName(id) }.getOrDefault(id.toString())
