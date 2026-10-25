@@ -96,12 +96,8 @@ abstract class TvTestBase {
     }
 
     private fun injectKeys(vararg events: KeyEvent) {
-        try {
-            events.forEach { event ->
-                check(instrumentation.uiAutomation.injectInputEvent(event, true)) { "Could not inject $event" }
-            }
-        } finally {
-            events.forEach { event -> event.recycle() }
+        events.forEach { event ->
+            check(instrumentation.uiAutomation.injectInputEvent(event, true)) { "Could not inject $event" }
         }
         instrumentation.waitForIdleSync()
     }
