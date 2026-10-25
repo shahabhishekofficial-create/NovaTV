@@ -72,6 +72,7 @@ abstract class TvTestBase {
         val launch = Intent(context, HomeActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         activity = instrumentation.startActivitySync(launch) as HomeActivity
         waitFor("cached channel grid") { gridCount() > 0 }
+        leaveTouchMode()
         return activity
     }
 
@@ -81,7 +82,6 @@ abstract class TvTestBase {
     }
 
     protected fun key(keyCode: Int) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) leaveTouchMode()
         onMain {
             activity.dispatchKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
             activity.dispatchKeyEvent(KeyEvent(KeyEvent.ACTION_UP, keyCode))
@@ -123,7 +123,9 @@ abstract class TvTestBase {
             check(view.getGlobalVisibleRect(bounds)) { "View $id has no visible click area" }
             check(bounds.width() == view.width && bounds.height() == view.height) { "View $id is clipped: $bounds" }
         }
-        tap(bounds)
+        onMain {
+            check(activity.findViewById<View>(id).performClick()) { "View $id did not handle click" }
+        }
         instrumentation.waitForIdleSync()
     }
 
